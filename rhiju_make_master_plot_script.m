@@ -10,25 +10,22 @@ data_files = {...
     'Bioanalyzer_6x_mRNAs_PSU_5mC_102120_Revisit_MATLAB.csv',...
     'Bioanalyzer_18xcombos_varyCDS_varyUTR_mRNAs_113020.csv',...
     'Bioanalyzer_averaged_k_deg_Final24_MATLAB_2020only.csv',...
-    }
+    'Bioanalyzer_2021_Stanford_S2P_unmodified.csv',...
+    'Bioanalyzer_2021_Stanford_S2P_m1PSU.csv',...
+    'Bioanalyzer_2021_Stanford_S2P_unmodified.csv',...
+    'Bioanalyzer_2021_Stanford_S2P_m1PSU.csv',...
+}
 %    'RollYourOwnStructure1_081720_Followup_CE_degradation_rates.csv',...
 %    'RTPCR_degradation_rates_082520_233x.csv',...
 %    '100720_mRNA-deg-gel.csv',...
 
-%data_files = {    'Bioanalyzer_averaged_012921_k_deg_Final24_PSU_MATLAB.csv','Bioanalyzer_031821_dsk_output_0318_P4P6norm_exp_fits_PYTHON.csv' };
-%data_files = {'Bioanalyzer_6x_mRNAs_PSU_5mC_102120_Revisit_MATLAB.csv', 'Bioanalyzer_averaged_012921_k_deg_Final24_PSU_MATLAB.csv' };
-%data_files = {'Bioanalyzer_18xcombos_varyCDS_varyUTR_mRNAs_113020.csv' };
-
-%data_files = {...
-%    'Bioanalyzer_averaged_012921_k_deg_Final24_PSU_MATLAB.csv'};
-%data_files = {'RTPCR_degradation_rates_081120_233x.csv','RollYourOwnStructure1_CloudLabMAPseq_EtOhPrecip_degradation_rates_Lib062020.csv','RT-CE_062620_P4P62HP_stability.csv'};
 start_pos = []; end_pos = [];
 k_deg = []; k_deg_err = [];
 data_set_number = [];
 RNA_type = {};
 RNA_sequences_data = {};
 for i = 1:length( data_files )
-    x = readtable(['data/',data_files{i}],'ReadVariableNames',1 ,'Delimiter',',');
+    x = readtable(['data/',data_files{i}],'ReadVariableNames',1 ,'Delimiter',',','VariableNamingRule','preserve');
     dx = table2cell( x );
     RNA_type = [RNA_type, dx(:,4)'];
     start_pos = [start_pos, cell2mat(dx(:,5))'];
@@ -40,6 +37,7 @@ for i = 1:length( data_files )
 end
 L = end_pos - start_pos + 1;
 
+    
 % plot the data -- just lengths
 set(figure(1),'pos',[36   553   800   800]); clf;
 
@@ -49,12 +47,19 @@ for i = 1:length(unique_RNA_types)
     gp = find(strcmp( RNA_type, unique_RNA_types{i} ) );
     %plot( L(gp), k_deg(gp),'x','linew',2 ); hold on
     L_jitter = L(gp)+5*randn(1,length(gp));
-    errorbar( L_jitter, k_deg(gp),k_deg_err(gp),'.'); hold on
+    h = errorbar( L_jitter, k_deg(gp),k_deg_err(gp),'.'); hold on
+    if length(gp) < 25;
+        set(h,'marker','o','markerfacecolor',get(h,'markeredgecolor'));
+    else
+        set(h,'marker','o','markerfacecolor','w');
+    end
+    set(h,'color',get_color_for_master_plot(unique_RNA_types{i}))
+    set(h,'marker',get_marker_for_master_plot(unique_RNA_types{i}))
 end
 
 k_cleave_LiBreaker = (7.91E-05) * 60;
 correct_LiBreaker = 1/3;
-x= [1:1200];
+x= [1:5000];
 %plot(x, k_cleave_LiBreaker*x, 'k-','color',[0.9 0.9 0.9]);
 plot(x, correct_LiBreaker *    k_cleave_LiBreaker*x, 'k-','color',[0.7 0.7 0.7]); hold on
 plot(x, correct_LiBreaker *0.4*k_cleave_LiBreaker*x,'-','color',[0.5 0.5 0.5],'linew',1.5);
@@ -77,6 +82,7 @@ prediction_file_sets = {...
     {'predictions/P4-P6/P_UNP_EternaFold_P4P6_sequence.txt','predictions/P4-P6/P4P6_sequence.txt'},...
     {'predictions/24FinalNLuc/P_UNP_24xNLuc_EternaFold.txt','predictions/24FinalNLuc/RNASEQUENCES_24xNLuc.txt'},...
     {'predictions/18CombosNLuc/P_UNP_18CombosNLuc_EternaFold.txt','predictions/18CombosNLuc/RNASEQUENCES_18CombosNLuc.txt'},...
+    {'predictions/S2P/P_UNP_S2P_EternaFold.txt','predictions/S2P/RNASEQUENCES_S2P.txt'},...
     };
 
 RNA_sequences_pred = {};
@@ -129,7 +135,7 @@ end
 clf;
 k_cleave_LiBreaker = (7.91E-05) * 60;
 correct_LiBreaker = 1/3;
-x= [1:1000];
+x= [1:5000];
 for i = 1:length(unique_RNA_types)
     gp = find(strcmp( RNA_type, unique_RNA_types{i} ) );
     if length(gp) > 1000; 
@@ -149,7 +155,29 @@ plot(x, correct_LiBreaker *    k_cleave_LiBreaker*x, 'k-'); hold on
 legend( [strrep(unique_RNA_types,'_',' '),{'1/3x Li,Breaker'}],'location','northwest');
 %legend( [strrep(data_files,'_',' '),{'1/2x Li,Breaker'}],'location','northwest');
 set(gcf, 'PaperPositionMode','auto','color','white');
-xlabel( 'SUP (EternaFold)');
+xlabel( 'Summed unpaired probability, SUP (EternaFold)');
 ylabel( 'k_{deg} (1/hr)');
-xlim([0 600])
+xlim([0 2200])
+ylim([-0.5 8])
 set(gca,'fontsize',11,'fontweight','bold','linew',1.5);
+
+
+%% Output data to final, easy-to-use .csv files
+outfile = 'RNA_deg_rates.csv';
+fid = fopen( outfile, 'w' );
+fprintf(fid, 'data_file,RNA_type,start_pos,end_pos,k_deg,k_deg_err,k_pred_eternafold,RNA_sequence\n');
+count = 0;
+for i = [3:length(unique_RNA_types),1,2]
+    gp = find(strcmp( RNA_type, unique_RNA_types{i} ) );
+    for n = gp
+        if isnan( k_pred(n) ) continue; end;
+        fprintf(fid, '%s,%s,%d,%d,%8.6f,%8.6f,%8.6f,%s\n',...
+            data_files{data_set_number(n)},strrep(RNA_type{n},',',' '),start_pos(n),end_pos(n),k_deg(n),k_deg_err(n),...
+            correct_LiBreaker *  k_cleave_LiBreaker*k_pred(n),...
+            RNA_sequences_data{n});
+        count = count + 1;
+    end
+end
+fprintf( 'Outputted %d entries to %s.\n',count,outfile );
+fclose(fid);
+
