@@ -4,9 +4,10 @@
 Calibration data for models of RNA degradation.
 
 Tips for modelers:  
-* Make predictions for degradation rates for each nucleotide in the RNA sequences specified in `all_RNA_sequences.csv`.  (`all_RNA_P_UNP_EternaFold.csv` shows an example).  
-* Then sum between `start_pos` and `end_pos` specified in `RNA_deg_rates.csv` and compare to the `k_deg` values there. The `k_deg_err` values there give estimates of experimental uncertainties.  
-* To allow for experiment to experiment variation in temperature/pH and overall hydrolysis rate, may want to float a per-experiment scale factor that varies by up to ~2x. Index on the `data_file` column.
+* Key data are in `RNA_deg_rates.csv` -- that's all you need.
+* You'll want to sum per-nucleotide degradation rates for the sequence between `start_pos` and `end_pos` specified in `RNA_deg_rates.csv` and compare to the `k_deg` values there. The `k_deg_err` values there give estimates of experimental uncertainties.  
+* Example predictions -- we've made predictions for degradation rates for each nucleotide in the RNA sequences specified in `all_RNA_sequences.csv` with EternaFold in `all_RNA_P_UNP_EternaFold.csv`; these give rise to `k_pred_eternafold` values.
+* To allow for experiment to experiment variation in temperature/pH and overall hydrolysis rate, may want to float a per-experiment scale factor that varies by up to ~2x. Index on the `data_file` column. (Authors of this repo haven't tried this yet.)
 
 More info on the experiments:
 
