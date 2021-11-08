@@ -4,15 +4,15 @@
 Calibration data for models of RNA degradation.
 
 Tips for modelers:  
-* Make predictions for degradation rates for each nucleotide in the RNA sequences specified in `RNA_sequences.csv`.  Then sum between `start_pos` and `end_pos` specified in `RNA_deg_rates.csv` and compare to the `k_deg` values there.  
-* The `k_deg_err` values there give estimates of experimental uncertainties.  
+* Make predictions for degradation rates for each nucleotide in the RNA sequences specified in `all_RNA_sequences.csv`.  (`all_RNA_P_UNP_EternaFold.csv` shows an example).  
+* Then sum between `start_pos` and `end_pos` specified in `RNA_deg_rates.csv` and compare to the `k_deg` values there. The `k_deg_err` values there give estimates of experimental uncertainties.  
 * To allow for experiment to experiment variation in temperature/pH and overall hydrolysis rate, may want to float a per-experiment scale factor that varies by up to ~2x. Index on the `data_file` column.
 
 More info on the experiments:
 
 * Overall hydrolysis rates (`k_deg`) for RNA molecules are in units of 1/hr. 
 * Several experimental methods used and a wide length range; see notes on data sources below.
-* Data were acquired by Ann Kladwang and analyzed by R. Das and Do Soon Kim as part of the **OpenVaccine** initiative.
+* Data were acquired by Ann Kladwang and largely analyzed by R. Das and Do Soon Kim as part of the **OpenVaccine** initiative; samples and experimental design for PERSIST-seq data included important contributions from Barna lab.
 * All measurements taken under _accelerated_ degradation conditions 10 mM MgCl2, 50 mM Na-CHES, pH 10 in the Das laboratory at Stanford University. Note that Mg(2+) ions and high pH all serve to accelerate degradation; conditions may mimic environment of RNA in some cationic formulations. Conditions ensured experiments could be completed in 24 hrs; rates measured under other conditions (no Mg2+, lower pH) correlate well.
 * Measurements acquired at ambient temperature of ~24 °C; note that due to unexpected laboratory temperature fluctuations, temperature may have varied between 22 to 25 °C, which may give rise to variations in overall modification rate between different days. 
 
@@ -24,13 +24,14 @@ Contact Rhiju Das (rhiju [at] stanford.edu) with any questions.
 
 ## Example of model fit
 
-![](RNA-deg-rates.png)
+![](prepare_data/RNA-deg-rates.png)
 
 Model plotted above is:  
 
 * EternaFold secondary structure ensemble (EternaFold is Contrafold-SE with parameters retrained based on data sets collected on Eterna; note no overlap of those training data with the degradation data here). See [this paper](https://www.biorxiv.org/content/10.1101/2020.05.29.124511v2.full).  
 * Predictions are summed unpaired probability (SUP), as described in [this paper](https://doi.org/10.1093/nar/gkab764). Note that sum is not necessarily over entire RNA. For experimental readouts that are based on reverse transcription-PCR, the observed degradation rates reflect degradation over only the window that is encompassed by the primer pairs. (These positions are given here as `start_pos` and `end_pos` in the data files). 
 * The proportionality constant plotted is 1/3 of the one predicted by the model of Li and Breaker at 10 mM Mg(2+), 25 °C, 25 mM monovalents (7.91E-05/nt/hr). 
+* An alternative fit based on DegScore does not go through all the points very well; see [analysis notebook in DegScore repo](https://github.com/eternagame/DegScore/blob/master/Demo/Degscore_Demo.ipynb).
 
 ## Data sources
 

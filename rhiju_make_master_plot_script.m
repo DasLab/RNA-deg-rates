@@ -15,7 +15,8 @@ data_files = {...
 %    'RollYourOwnStructure1_081720_Followup_CE_degradation_rates.csv',...
 %    'RTPCR_degradation_rates_082520_233x.csv',...
 %    '100720_mRNA-deg-gel.csv',...
-
+barcode = {};
+human_readable_name = {};
 start_pos = []; end_pos = [];
 k_deg = []; k_deg_err = [];
 data_set_number = [];
@@ -24,6 +25,8 @@ RNA_sequences_data = {};
 for i = 1:length( data_files )
     x = readtable(['data/',data_files{i}],'ReadVariableNames',1 ,'Delimiter',',','VariableNamingRule','preserve');
     dx = table2cell( x );
+    barcode = [barcode, dx(:,1)']; % oh this doesn't seem to always be the barcode, darn.
+    human_readable_name = [human_readable_name, dx(:,2)'];
     RNA_type = [RNA_type, dx(:,4)'];
     start_pos = [start_pos, cell2mat(dx(:,5))'];
     end_pos   = [end_pos, cell2mat(dx(:,6))'];
@@ -167,20 +170,42 @@ set(gca,'fontsize',11,'fontweight','bold','linew',1.5);
 %% Output data to final, easy-to-use .csv files
 outfile = '../RNA_deg_rates.csv';
 fid = fopen( outfile, 'w' );
-fprintf(fid, 'data_file,RNA_type,modification,start_pos,end_pos,k_deg,k_deg_err,k_pred_eternafold,RNA_sequence\n');
+fprintf(fid, 'data_file,RNA_type,modification,start_pos,end_pos,k_deg,k_deg_err,k_pred_eternafold,RNA_sequence,human_readable_name\n');
 count = 0;
 for i = [3:length(unique_RNA_types),1,2]
     gp = find(strcmp( RNA_type, unique_RNA_types{i} ) );
     for n = gp
         if isnan( k_pred(n) ) continue; end;
-        fprintf(fid, '%s,%s,%s,%d,%d,%8.6f,%8.6f,%8.6f,%s\n',...
+        fprintf(fid, '%s,%s,%s,%d,%d,%8.6f,%8.6f,%8.6f,%s,%s\n',...
             data_files{data_set_number(n)},strrep(RNA_type{n},',',' '),modification{n},...
             start_pos(n),end_pos(n),k_deg(n),k_deg_err(n),...
             correct_LiBreaker *  k_cleave_LiBreaker*k_pred(n),...
-            RNA_sequences_data{n});
+            RNA_sequences_data{n},human_readable_name{n});
         count = count + 1;
     end
 end
 fprintf( 'Outputted %d entries to %s.\n',count,outfile );
+fclose(fid);
+
+%% Output sequences predictions to final, easy-to-use .csv files
+outfile = '../all_RNA_sequences.csv';
+fid = fopen( outfile, 'w' );
+for i = 1: length(RNA_sequences_pred)
+    fprintf(fid, '%s\n', RNA_sequences_pred{i});
+end
+fprintf( 'Outputted %d entries to %s.\n',length(RNA_sequences_pred),outfile );
+fclose(fid);
+
+
+%% Output EternaFold predictions to final, easy-to-use .csv files
+outfile = '../all_RNA_P_UNP_EternaFold.csv';
+fid = fopen( outfile, 'w' );
+for i = 1: size(pred,2)
+    for j = 1:length(RNA_sequences_pred{i})
+        fprintf(fid, '%8.6f,', pred(j,i));
+    end
+    fprintf(fid,'\n');
+end
+fprintf( 'Outputted %d entries to %s.\n',size(pred,2),outfile );
 fclose(fid);
 
