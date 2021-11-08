@@ -31,6 +31,7 @@ Model plotted above is:
 
 * EternaFold secondary structure ensemble (EternaFold is Contrafold-SE with parameters retrained based on data sets collected on Eterna; note no overlap of those training data with the degradation data here). See [this paper](https://www.biorxiv.org/content/10.1101/2020.05.29.124511v2.full).  
 * Predictions are summed unpaired probability (SUP), as described in [this paper](https://doi.org/10.1093/nar/gkab764). Note that sum is not necessarily over entire RNA. For experimental readouts that are based on reverse transcription-PCR, the observed degradation rates reflect degradation over only the window that is encompassed by the primer pairs. (These positions are given here as `start_pos` and `end_pos` in the data files). 
+* For RNA's synthesized with pseudouridine (PSU) or N-1-methyl-pseudouridine (m1PSU), predictions were zeroed out at the linkage 3' to the subsitution site, reflecting observations noted in [Leppek et al., 2021](https://www.biorxiv.org/content/10.1101/2021.03.29.437587v1.full). (Reducing or zeroing the predicted degradation 5' to the substitution is worth checking too, just not done here.)
 * The proportionality constant plotted is 1/3 of the one predicted by the model of Li and Breaker at 10 mM Mg(2+), 25 °C, 25 mM monovalents (7.91E-05/nt/hr). 
 * An alternative fit based on DegScore does not go through all the points very well; see [analysis notebook in DegScore repo](https://github.com/eternagame/DegScore/blob/master/Demo/Degscore_Demo.ipynb).
 
