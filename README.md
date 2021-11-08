@@ -15,7 +15,7 @@ More info on the experiments:
 * Several experimental methods used and a wide length range; see notes on data sources below.
 * Data were acquired by Ann Kladwang and largely analyzed by R. Das and Do Soon Kim as part of the **OpenVaccine** initiative; samples and experimental design for PERSIST-seq data included important contributions from Barna lab.
 * All measurements taken under _accelerated_ degradation conditions 10 mM MgCl2, 50 mM Na-CHES, pH 10 in the Das laboratory at Stanford University. Note that Mg(2+) ions and high pH all serve to accelerate degradation; conditions may mimic environment of RNA in some cationic formulations. Conditions ensured experiments could be completed in 24 hrs; rates measured under other conditions (no Mg2+, lower pH) correlate well.
-* Measurements acquired at ambient temperature of ~24 °C; note that due to unexpected laboratory temperature fluctuations, temperature may have varied between 22 to 25 °C, which may give rise to variations in overall modification rate between different days. 
+* Measurements acquired at ambient temperature of ~24 °C; note that due to unexpected laboratory temperature fluctuations, temperature may have varied between 21 to 25 °C, which may give rise to variations in overall modification rate between different days. 
 
 Contact Rhiju Das (rhiju [at] stanford.edu) with any questions.
 
